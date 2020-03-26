@@ -26,13 +26,13 @@ func (c *Client) APIInfo() (*APIInfo, error) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer resp.Body.Close()
 	//	fmt.Println(resp)
 
 	var ret APIInfo
 	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	return &ret, err
 
 }
