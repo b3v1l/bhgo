@@ -20,18 +20,18 @@ type HostLocation struct {
 }
 
 type Host struct {
-	//OS        string   `json:"os"`
-	//Timestamp string   `json:"timestamp"`
-	//ISP string `json:"isp"`
-	//ASN       string   `json:"asn"`
-	//Hostnames []string `json:"hostnames"`
-	//Location  HostLocation `json:"location"`
-	//IP       int64    `json:"ip"`
-	//Domains  []string `json:"domains"`
-	//Org      string   `json:"org"`
-	//Data     string   `json:"data"`
-	//Port     int    `json:"port"`
-	IPString string `json:"ip_str"`
+	OS        string       `json:"os"`
+	Timestamp string       `json:"timestamp"`
+	ISP       string       `json:"isp"`
+	ASN       string       `json:"asn"`
+	Hostnames []string     `json:"hostnames"`
+	Location  HostLocation `json:"location"`
+	IP        int64        `json:"ip"`
+	Domains   []string     `json:"domains"`
+	Org       string       `json:"org"`
+	Data      string       `json:"data"`
+	Port      int          `json:"port"`
+	IPString  string       `json:"ip_str"`
 }
 
 type HostSearch struct {
@@ -40,7 +40,7 @@ type HostSearch struct {
 
 func (c *Client) HostSearch(query string) (*HostSearch, error) {
 
-	resp, err := http.Get(fmt.Sprintf("%s/shodan/search?key=%s&query=%s", BaseURL, c.apiKey, query))
+	resp, err := http.Get(fmt.Sprintf("%s/shodan/host/search?key=%s&query=%s", BaseURL, c.apiKey, query))
 
 	if err != nil {
 		return nil, err
