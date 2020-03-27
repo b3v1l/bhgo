@@ -17,7 +17,7 @@ type HostIP struct {
 	DmaCode      int         `json:"dma_code"`
 	CountryCode  string      `json:"country_code"`
 	Org          string      `json:"org"`
-	Data         []Data      `json:"data"`
+	Data         Data        `json:"data"`
 	City         string      `json:"city"`
 	Isp          string      `json:"isp"`
 	Longitude    float64     `json:"longitude"`
@@ -30,14 +30,14 @@ type HostIP struct {
 }
 
 type Data struct {
-	Product string `json:"product"`
-	Title   string `json:"title"`
+	//Product string `json:"product"`
+	//Title   string `json:"title"`
 
 	//Timestamp string   `json:"timestamp"`
-	Isp  string   `json:"isp"`
-	Cpe  []string `json:"cpe"`
-	Data string   `json:"data"`
-	HTML string   `json:"html"`
+	//Isp  string   `json:"isp"`
+	//Cpe  []string `json:"cpe"`
+	//Data string   `json:"data"`
+	//	HTML string   `json:"html"`
 
 	IP        int         `json:"ip"`
 	Domains   []string    `json:"domains"`

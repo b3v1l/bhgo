@@ -68,7 +68,8 @@ func main() {
 		//for _, v := range query.Data {
 		//	fmt.Printf("Ip %v", v)
 		//}
-		fmt.Printf("Hosting %v\n", query.Data[len(query.Data)-1])
+
+		fmt.Printf("Hosting %v\n", query.Data.IPStr[0:])
 
 	default:
 		fmt.Println("Error parsing options ! Exiting ...")
