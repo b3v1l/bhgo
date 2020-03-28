@@ -14,85 +14,96 @@ func main() {
 
 	//flag.Usage()
 
-	orgCmd := flag.NewFlagSet("org", flag.ContinueOnError)
+	orgCmd := flag.NewFlagSet("org", flag.ExitOnError)
 	orgGet := orgCmd.String("h", "", "Usage: -h ORG. Retrieved information about target Organisation")
 
 	// Domain name
 	dnsreq := flag.NewFlagSet("dns", flag.ExitOnError)
 	dns := dnsreq.String("d", "", "Usage: -dns 'Domain Name'")
 
-	domCmd := flag.NewFlagSet("domain", flag.ContinueOnError)
+	domCmd := flag.NewFlagSet("domain", flag.ExitOnError)
 	domGet := domCmd.String("d", "", "Usage: domain -d 'Domain name'")
 
+	ipCmd := flag.NewFlagSet("ip", flag.ExitOnError)
+	ipGet := ipCmd.String("h", "", "Usage: ip -h 1.2.3.4")
 	//Dns Reverse resolution
 
 	if len(os.Args) < 2 {
 		flag.PrintDefaults()
 		fmt.Println("Usage: shodan-scan <command> [<args>]")
-		fmt.Println("Commands are 'ip - dns - domain'")
+		fmt.Println("	Commands are 'org - ip - dns - domain'")
 		os.Exit(2)
-		//flag.Usage()
-		//log.Fatalln("Usage: shodan Searchterm")
-		//		os.Exit(1)
+
 	}
 
-	ipCmd := flag.NewFlagSet("ip", flag.ExitOnError)
-	ipGet := ipCmd.String("h", "", "Usage: ip -h 1.2.3.4")
+	switch os.Args[1] {
+	case "org":
 
-	//fmt.Println(*dns)
+		orgCmd.Parse(os.Args[2:])
+		if orgCmd.Parsed() {
+			// Required Flags
+			if *orgGet == "" {
+				orgCmd.PrintDefaults()
+				os.Exit(1)
+			}
+		}
+		OrgSearch(*orgGet)
+
+	case "dns":
+		dnsreq.Parse(os.Args[2:])
+		if dnsreq.Parsed() {
+			// Required Flags
+			if *dns == "" {
+				dnsreq.PrintDefaults()
+				os.Exit(1)
+			}
+		}
+		Dns(*dns)
+
+	case "ip":
+		ApiStat()
+		ipCmd.Parse(os.Args[2:])
+		if ipCmd.Parsed() {
+			// Required Flags
+			if *ipGet == "" {
+				ipCmd.PrintDefaults()
+				os.Exit(1)
+			}
+		}
+		IpQuery(*ipGet)
+
+	case "domain":
+		ApiStat()
+		domCmd.Parse(os.Args[2:])
+		if domCmd.Parsed() {
+			// Required Flags
+			if *domGet == "" {
+				domCmd.PrintDefaults()
+				os.Exit(1)
+			}
+		}
+		Domain(*domGet)
+
+	default:
+		fmt.Println("Usage: shodan-scan <command> [<args>]")
+		fmt.Println("Commands are 'org - ip - dns - domain'")
+		os.Exit(2)
+	}
+}
+
+func ApiStat() {
+
 	apiKey := os.Getenv("SHODAN_API_KEY")
 	s := shodan.New(apiKey)
 	info, err := s.APIInfo()
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println("\n**************STATS******************")
 	fmt.Printf(
 		"[+] Query Credits left = %d\n[+] Scan_Credits left = %d\n",
 		info.Querycredits, info.Scancredits)
-
-	//flag.Parse()
-
-	switch os.Args[1] {
-	case "org":
-
-		orgCmd.Parse(os.Args[2:])
-		OrgSearch(*orgGet)
-		fmt.Println(len(os.Args[2:]))
-		if len(os.Args[2:]) == 0 {
-			//fmt.Println("Usage: org -h organisation")
-			os.Exit(1)
-		}
-
-	case "dns":
-		dnsreq.Parse(os.Args[2:])
-		Dns(*dns)
-		if len(os.Args[2:]) <= 1 {
-			//fmt.Println("Usage: org -h organisation")
-			os.Exit(1)
-		}
-
-	case "ip":
-		ipCmd.Parse(os.Args[2:])
-		query, err := s.HostIP(*ipGet)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		//for _, v := range query.Data {
-		//	fmt.Printf("Ip %v", v)
-		//}
-		fmt.Printf("Hosting %v\n", query.Data[0:])
-
-	case "domain":
-
-		domCmd.Parse(os.Args[2:])
-		Domain(*domGet)
-
-	default:
-		fmt.Println("Usage: shodan-scan <command> [<args>]")
-		fmt.Println("Commands are 'ip - dns - domain'")
-		os.Exit(2)
-	}
-
+	fmt.Println("*************************************\n")
 }
 
 func OrgSearch(org string) {
@@ -103,17 +114,14 @@ func OrgSearch(org string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	if len(os.Args[2:]) == 0 {
-		os.Exit(1)
-	} else {
-		fmt.Printf("[*] Results for target '%v'\n\n", org)
-		for _, host := range query.Matches {
-			//		index := len(host.Domains)
-			for _, hosting := range host.Domains {
-				fmt.Printf("IP:%18s Port:%8d Hosting:%30s Location: %v\n", host.IPString, host.Port, hosting, host.Location)
-			}
+	fmt.Printf("[*] Results for target '%v'\n\n", org)
+	for _, host := range query.Matches {
+		//		index := len(host.Domains)
+		for _, hosting := range host.Domains {
+			fmt.Printf("IP:%18s Port:%8d Hosting:%30s Location: %v\n", host.IPString, host.Port, hosting, host.Location)
 		}
 	}
+
 }
 func Dns(dns string) {
 
@@ -127,7 +135,7 @@ func Dns(dns string) {
 		fmt.Println(err)
 	}
 	for _, v := range dsearch {
-		fmt.Printf("DNS Resolution  : %v\n", v)
+		fmt.Printf("DNS Resolution  : \n%v\n", v)
 	}
 }
 
@@ -141,9 +149,23 @@ func Domain(dom string) {
 		fmt.Println(err)
 	}
 	fmt.Printf("Result for domain %v\n", resp.Domain)
-	fmt.Printf("Result for domain %v\n", resp.Tags)
+	fmt.Printf("Tags %v\n", resp.Tags)
 
 	for _, v := range resp.Data {
 		fmt.Printf("%s\n", v)
 	}
+}
+
+func IpQuery(q string) {
+
+	apiKey := os.Getenv("SHODAN_API_KEY")
+	s := shodan.New(apiKey)
+	query, err := s.HostIP(q)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for _, v := range query.Data {
+		fmt.Printf("Ip %v\n", v)
+	}
+	//fmt.Printf("Hosting %v\n", query.Data[0:])
 }
