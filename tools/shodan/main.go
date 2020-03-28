@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+//Global key API variable
+var apiKey = os.Getenv("SHODAN_API_KEY")
+var s = shodan.New(apiKey)
+
 func main() {
 	// Organisation search
 
@@ -93,8 +97,6 @@ func main() {
 
 func ApiStat() {
 
-	apiKey := os.Getenv("SHODAN_API_KEY")
-	s := shodan.New(apiKey)
 	info, err := s.APIInfo()
 	if err != nil {
 		fmt.Println(err)
@@ -108,8 +110,6 @@ func ApiStat() {
 
 func OrgSearch(org string) {
 
-	apiKey := os.Getenv("SHODAN_API_KEY")
-	s := shodan.New(apiKey)
 	query, err := s.HostSearch(org)
 	if err != nil {
 		fmt.Println(err)
@@ -125,8 +125,6 @@ func OrgSearch(org string) {
 }
 func Dns(dns string) {
 
-	apiKey := os.Getenv("SHODAN_API_KEY")
-	s := shodan.New(apiKey)
 	hostlist := make([]string, 0)
 	hostlist = append(hostlist, dns)
 	dsearch, err := s.DnsSearch(hostlist)
@@ -140,9 +138,6 @@ func Dns(dns string) {
 }
 
 func Domain(dom string) {
-
-	apiKey := os.Getenv("SHODAN_API_KEY")
-	s := shodan.New(apiKey)
 
 	resp, err := s.DomainInfo(dom)
 	if err != nil {
@@ -158,8 +153,6 @@ func Domain(dom string) {
 
 func IpQuery(q string) {
 
-	apiKey := os.Getenv("SHODAN_API_KEY")
-	s := shodan.New(apiKey)
 	query, err := s.HostIP(q)
 	if err != nil {
 		log.Fatalln(err)
