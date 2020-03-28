@@ -17,7 +17,7 @@ type HostIP struct {
 	DmaCode      int         `json:"dma_code"`
 	CountryCode  string      `json:"country_code"`
 	Org          string      `json:"org"`
-	Data         Data        `json:"data"`
+	Data         []Data      `json:"data"`
 	City         string      `json:"city"`
 	Isp          string      `json:"isp"`
 	Longitude    float64     `json:"longitude"`
@@ -56,9 +56,10 @@ func (c *Client) HostIP(ip string) (*HostIP, error) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer resp.Body.Close()
+
 	if err := json.NewDecoder(resp.Body).Decode(&h); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	return h, nil
 }
